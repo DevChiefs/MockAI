@@ -15,16 +15,16 @@ datasource db {
 }
 
 
-model User {
-  id    Int    @id @default(autoincrement())
-  name  String
-  posts Post[]
-}
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  published Boolean @default(true)
-  authorId  Int
-  author    User    @relation(fields: [authorId], references: [id])
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String?  @unique // used for local auth or when provider gives email
+  password    String?          // only required for local auth
+  provider    String?          // e.g. "google", "github", "local"
+  providerId  String?          // ID from OAuth provider (null for local)
+  name        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([provider, providerId]) // ensures unique provider accounts
 }
