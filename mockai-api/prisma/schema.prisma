@@ -14,17 +14,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+enum Role {
+  USER
+  ADMIN
+}
 
 model User {
   id          Int      @id @default(autoincrement())
+  username    String? 
   email       String?  @unique // used for local auth or when provider gives email
   password    String?          // only required for local auth
   provider    String?          // e.g. "google", "github", "local"
   providerId  String?          // ID from OAuth provider (null for local)
-  name        String?
   createdAt   DateTime @default(now())
+  roles       Role[]  @default([USER])
   updatedAt   DateTime @updatedAt
 
   @@unique([provider, providerId]) // ensures unique provider accounts
-}
+} 
