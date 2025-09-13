@@ -1,25 +1,64 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { LoginInput, RegisterInput } from './auth.type';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async signIn(
-    username: string,
-    pass: string,
-  ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+  async login(loginInput: LoginInput) {
+    const { email, password } = loginInput;
+
+    const user = await this.usersService.findByEmail(email);
+    if (!user || !user.password) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { sub: user.userId, username: user.username };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = { id: user.id, email: user.email };
+    const accessToken = this.jwtService.sign(payload);
+
+    return { accessToken, user };
+  }
+
+  async register(registerInput: RegisterInput) {
+    const { username, email, password, confirmPassword } = registerInput;
+    const existingUser = await this.usersService.findByEmail(email);
+    if (existingUser) {
+      throw new ConflictException('Email already registered');
+    }
+
+    if (password !== confirmPassword) {
+      throw new ConflictException('Passwords do not match');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await this.usersService.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    const payload = { id: user.id, email: user.email };
+    const accessToken = this.jwtService.sign(payload);
+
+    return { accessToken, user };
   }
 }
