@@ -27,8 +27,20 @@ model User {
   provider    String?          // e.g. "google", "github", "local"
   providerId  String?          // ID from OAuth provider (null for local)
   createdAt   DateTime @default(now())
-  roles       Role[]  @default([USER])
+  role      Role   @default(USER)
   updatedAt   DateTime @updatedAt
 
   @@unique([provider, providerId]) // ensures unique provider accounts
 } 
+
+model Session {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  title      String
+  resumeTxt  String
+  jobDesc    String
+  startTime  DateTime?
+  endTime    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

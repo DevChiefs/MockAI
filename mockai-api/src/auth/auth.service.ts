@@ -22,7 +22,9 @@ export class AuthService {
   async login(loginInput: LoginInput) {
     const { email, password } = loginInput;
 
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findOne({
+      email,
+    });
     if (!user || !user.password) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -40,7 +42,9 @@ export class AuthService {
 
   async register(registerInput: RegisterInput) {
     const { username, email, password, confirmPassword } = registerInput;
-    const existingUser = await this.usersService.findByEmail(email);
+    const existingUser = await this.usersService.findOne({
+      email,
+    });
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }

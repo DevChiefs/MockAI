@@ -29,6 +29,8 @@
     "@prisma/client": "^6.16.0",
     "axios": "^1.12.1",
     "bcryptjs": "^3.0.2",
+    "multer": "^2.0.2",
+    "pdf-parse": "^1.1.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -40,6 +42,7 @@
     "@nestjs/testing": "^11.0.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",

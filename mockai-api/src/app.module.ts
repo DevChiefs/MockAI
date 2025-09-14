@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
+import { SessionModule } from './session/session.module';
 import config from './config';
 
 @Module({
@@ -14,6 +15,7 @@ import config from './config';
     }),
     forwardRef(() => AuthModule),
     forwardRef(() => UsersModule),
+    forwardRef(() => SessionModule),
   ],
   controllers: [AppController],
   providers: [AppService],

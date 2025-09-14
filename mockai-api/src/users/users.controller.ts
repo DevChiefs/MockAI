@@ -12,17 +12,8 @@ import {
 import { UsersService } from './users.service';
 import { User } from 'generated/prisma';
 import type { CreateUserInput } from './users.type';
+import type { AuthenticatedRequest } from 'src/auth/auth.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { Request as ExpressRequest } from 'express';
-
-interface JwtPayload {
-  id: string;
-  email: string;
-}
-
-interface AuthenticatedRequest extends ExpressRequest {
-  user?: JwtPayload;
-}
 
 @Controller('user')
 export class UsersController {
@@ -30,14 +21,14 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async getCurrentUser(
-    @Request() req: AuthenticatedRequest,
-  ): Promise<User | null> {
+  async user(@Request() req: AuthenticatedRequest): Promise<User | null> {
     const userId = req.user?.id;
     if (!userId) {
       return null;
     }
-    return this.usersService.findById(parseInt(userId, 10));
+    return this.usersService.findOne({
+      id: parseInt(userId, 10),
+    });
   }
 
   @Post()
