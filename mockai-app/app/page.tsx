@@ -12,7 +12,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden font-sans">
-      <div className="absolute inset-0 opacity-20">
+      <div className="hidden md:block absolute inset-0 opacity-20">
         <FaultyTerminal
           scale={1.2}
           gridMul={[3, 2]}
