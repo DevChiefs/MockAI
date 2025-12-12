@@ -1,7 +1,15 @@
+"use client";
+
 import FaultyTerminal from "@/components/faulty-terminal-bg";
 import Image from "next/image";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden font-sans">
       <div className="absolute inset-0 opacity-20">
@@ -39,25 +47,27 @@ export default function Home() {
               MockAI
             </span>
           </div>
-          <div className="hidden md:flex space-x-8">
-            <a
-              href="#features"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Features
-            </a>
-            <a
-              href="#about"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              About
-            </a>
-            <a
-              href="#contact"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Get Started
-            </a>
+          <div className="flex items-center space-x-8">
+            <div className="hidden md:flex space-x-8">
+              <a
+                href="#features"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Features
+              </a>
+              <a
+                href="#about"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                About
+              </a>
+              <a
+                href="/register"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Get Started
+              </a>
+            </div>
           </div>
         </nav>
 
@@ -75,8 +85,15 @@ export default function Home() {
               guidance and real-time feedback.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-                Start Practicing
+              <button
+                onClick={() =>
+                  isAuthenticated
+                    ? router.push("/practice")
+                    : router.push("/register")
+                }
+                className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                {isAuthenticated ? "Start Practicing" : "Get Started Free"}
               </button>
               <button className="border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300">
                 Watch Demo
@@ -182,9 +199,16 @@ export default function Home() {
               dream jobs with MockAI&apos;s comprehensive interview preparation
               platform.
             </p>
-            <button className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-10 py-5 rounded-lg text-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-              Get Started for Free
-            </button>
+            <Button
+              onClick={() =>
+                isAuthenticated
+                  ? router.push("/practice")
+                  : router.push("/register")
+              }
+              className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-10 py-5 rounded-lg text-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              {isAuthenticated ? "Go to Dashboard" : "Get Started for Free"}
+            </Button>
           </div>
         </section>
 
