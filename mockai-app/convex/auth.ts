@@ -82,7 +82,7 @@ export const signUp = action({
               {
                 title: "New User Sign Up",
                 description: `New user ${args.name || "Unknown"} with email ${args.email} has signed up!`,
-                color: 0x00ff00,
+                color: 0x2563eb,
                 fields: [
                   {
                     name: "User Name",

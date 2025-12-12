@@ -88,7 +88,7 @@ export default function Home() {
               <button
                 onClick={() =>
                   isAuthenticated
-                    ? router.push("/practice")
+                    ? router.push("/dashboard")
                     : router.push("/register")
                 }
                 className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"

@@ -29,10 +29,13 @@ export const metadata: Metadata = {
   publisher: "MockAI",
   icons: {
     icon: [
-      { url: "/mockai-trans-bg.png", sizes: "any" },
-      { url: "/favicon.ico", sizes: "any" },
+      { url: "/mockai-logo.svg", type: "image/svg+xml" },
+      { url: "/mockai-trans-bg.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico", sizes: "32x32" },
     ],
-    apple: [{ url: "/mockai-trans-bg.png" }],
+    apple: [
+      { url: "/mockai-trans-bg.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   openGraph: {
     title: "MockAI - AI-Powered Interview Practice",
@@ -55,9 +58,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/mockai-trans-bg.png" type="image/png" />
-      </head>
       <body className={`${poppins.variable} antialiased`}>
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>
