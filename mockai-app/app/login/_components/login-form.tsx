@@ -18,6 +18,7 @@ import FaultyTerminal from "@/components/faulty-terminal-bg";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import Image from "next/image";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -55,9 +56,11 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden font-sans">
+    <div className="app-shell min-h-screen overflow-hidden text-white">
+      <div className="grid-overlay pointer-events-none absolute inset-0 opacity-25" />
+
       {/* Terminal Background */}
-      <div className="hidden md:block absolute inset-0 opacity-20">
+      <div className="pointer-events-none absolute inset-0 hidden opacity-20 md:block">
         <FaultyTerminal
           scale={1.2}
           gridMul={[3, 2]}
@@ -80,18 +83,38 @@ export default function LoginForm() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="relative z-10 min-h-screen">
+        <nav className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 pt-6">
+          <Link href="/" className="flex items-center gap-2 text-slate-200">
+            <Image
+              src="/mockai-trans-bg.png"
+              alt="MockAI Logo"
+              width={30}
+              height={30}
+            />
+            <span className="font-medium">MockAI</span>
+          </Link>
+          <Link
+            href="/"
+            className="text-sm text-slate-300 transition-colors hover:text-white"
+          >
+            Back to Home
+          </Link>
+        </nav>
+
         {/* Login Form */}
-        <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-6 py-12">
           <div className="w-full max-w-md">
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-8 shadow-2xl">
+            <div className="glass-card rounded-2xl p-8">
+              <p className="section-label">Welcome Back</p>
+
               <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold mb-2">
+                <h1 className="mb-2 mt-4 text-4xl font-semibold">
                   <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                    Welcome Back
+                    Sign In To Continue
                   </span>
                 </h1>
-                <p className="text-gray-400">Sign in to continue to MockAI</p>
+                <p className="text-gray-300">Pick up where you left off.</p>
               </div>
 
               <Form {...form}>

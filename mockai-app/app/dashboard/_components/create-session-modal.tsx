@@ -16,6 +16,10 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const formSchema = z.object({
   jobTitle: z.string().min(1, "Job title is required"),
+  jobDescription: z
+    .string()
+    .min(30, "Job description must be at least 30 characters")
+    .max(20_000, "Job description is too long"),
   resumeFile: z
     .custom<FileList>()
     .refine((files) => files?.length === 1, "Resume PDF is required")
@@ -77,15 +81,16 @@ export default function CreateSessionModal({
   });
 
   const resumeFile = watch("resumeFile");
+  const jobDescription = watch("jobDescription");
 
   // Update selected file name when file changes
-  useState(() => {
+  useEffect(() => {
     if (resumeFile && resumeFile.length > 0) {
       setSelectedFileName(resumeFile[0].name);
     } else {
       setSelectedFileName(null);
     }
-  });
+  }, [resumeFile]);
 
   const onSubmit = async (data: FormData) => {
     // Check if PDF.js is loaded
@@ -139,6 +144,7 @@ export default function CreateSessionModal({
       const sessionResult = await createSession({
         token,
         jobTitle: data.jobTitle,
+        jobDescription: data.jobDescription,
         resumeText: cleanText,
       });
 
@@ -177,8 +183,8 @@ export default function CreateSessionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-900 border border-gray-800 rounded-xl max-w-md w-full p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+      <div className="glass-card relative w-full max-w-md rounded-2xl p-6">
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -191,7 +197,7 @@ export default function CreateSessionModal({
         {/* Header */}
         <h2 className="text-2xl font-bold mb-2">Create Interview Session</h2>
         <p className="text-gray-400 mb-6">
-          Upload your resume and specify the job you&apos;re applying for
+          Add role details and upload your resume to start a focused interview
         </p>
 
         {/* Form */}
@@ -212,6 +218,29 @@ export default function CreateSessionModal({
             {errors.jobTitle && (
               <p className="text-red-400 text-sm mt-1">
                 {errors.jobTitle.message}
+              </p>
+            )}
+          </div>
+
+          {/* Job Description Input */}
+          <div>
+            <Label htmlFor="jobDescription" className="text-white">
+              Job Description
+            </Label>
+            <textarea
+              id="jobDescription"
+              placeholder="Paste the role requirements, responsibilities, and preferred skills..."
+              {...register("jobDescription")}
+              disabled={isProcessing}
+              rows={6}
+              className="mt-2 w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+            <div className="mt-1 text-right text-xs text-gray-400">
+              {(jobDescription?.length || 0).toLocaleString()}/20,000
+            </div>
+            {errors.jobDescription && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.jobDescription.message}
               </p>
             )}
           </div>
@@ -296,7 +325,7 @@ export default function CreateSessionModal({
               variant="outline"
               onClick={handleClose}
               disabled={isProcessing}
-              className="flex-1 border-gray-700 text-black hover:text-white hover:bg-gray-800"
+              className="flex-1 border-white/20 bg-white/5 text-white hover:bg-white/10"
             >
               Cancel
             </Button>

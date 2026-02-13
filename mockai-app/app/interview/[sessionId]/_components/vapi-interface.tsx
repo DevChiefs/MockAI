@@ -15,12 +15,58 @@ type VapiClient = any;
 interface VapiInterfaceProps {
   sessionId: Id<"interviewSessions">;
   jobTitle: string;
+  jobDescription?: string;
   resumeText: string;
 }
+
+interface InterviewCoachConfig {
+  firstMessage: string;
+  systemPrompt: string;
+  focusAreas: string[];
+}
+
+interface CoachConfigApiResponse {
+  success: boolean;
+  source?: "langchain" | "fallback";
+  data?: InterviewCoachConfig;
+  error?: string;
+}
+
+const buildFallbackCoachConfig = (
+  jobTitle: string,
+  resumeText: string,
+  jobDescription?: string
+): InterviewCoachConfig => ({
+  firstMessage: `Hello! I'm excited to interview you for the ${jobTitle} role. I reviewed your resume and will ask targeted questions. Let's start: tell me about yourself and why this role is a strong fit for you.`,
+  systemPrompt: `You are an expert AI interview coach conducting a professional interview for the position: ${jobTitle}.
+
+JOB DESCRIPTION:
+${jobDescription?.trim() ? jobDescription.trim().slice(0, 8_000) : "Not provided"}
+
+CANDIDATE RESUME:
+${resumeText.replace(/\s+/g, " ").trim().slice(0, 12_000)}
+
+YOUR ROLE:
+1. Run a realistic interview with 5-7 strong questions.
+2. Ask one question at a time and wait for the candidate's response.
+3. Mix behavioral, technical, and problem-solving questions.
+4. Reference resume details when relevant.
+5. Give short, constructive feedback after important answers.
+6. Ask concise follow-up questions to probe depth.
+7. Keep tone warm, direct, and professional.
+8. End by asking if they have any questions for the interviewer.
+
+DO NOT:
+- Ask "How can I help you?"
+- Dump multiple questions in one turn
+- Break role as interviewer`,
+  focusAreas: ["experience depth", "technical clarity", "communication quality"],
+});
 
 export default function VapiInterface({
   sessionId,
   jobTitle,
+  jobDescription,
   resumeText,
 }: VapiInterfaceProps) {
   const router = useRouter();
@@ -29,6 +75,7 @@ export default function VapiInterface({
   const [isAISpeaking, setIsAISpeaking] = useState(false);
   const [status, setStatus] = useState<string>("Ready to start");
   const [error, setError] = useState<string | null>(null);
+  const [focusAreas, setFocusAreas] = useState<string[]>([]);
   const vapiRef = useRef<VapiClient | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const callRef = useRef<any>(null); // Store the active call object
@@ -206,42 +253,65 @@ export default function VapiInterface({
     }
 
     try {
-      setStatus("Connecting...");
+      setStatus("Preparing interview...");
       setError(null);
 
-      // Create assistant configuration with resume context
+      let coachConfig = buildFallbackCoachConfig(
+        jobTitle,
+        resumeText,
+        jobDescription
+      );
+
+      try {
+        const response = await fetch("/api/interview/coach-config", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jobTitle,
+            jobDescription,
+            resumeText,
+          }),
+        });
+
+        if (response.ok) {
+          const payload = (await response.json()) as CoachConfigApiResponse;
+          if (payload.success && payload.data) {
+            coachConfig = payload.data;
+          } else if (payload.error) {
+            console.error("Coach config API returned an error:", payload.error);
+          }
+
+          if (payload.source === "fallback") {
+            console.warn(
+              "Using fallback interview coach config (LangChain unavailable)."
+            );
+          }
+        } else {
+          console.error(
+            "Coach config API request failed with status:",
+            response.status
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch coach config:", error);
+      }
+
+      setFocusAreas(coachConfig.focusAreas.slice(0, 4));
+      setStatus("Connecting...");
+
+      // Create assistant configuration with LangChain/fallback prompt context
       const assistantConfig = {
         name: "Interview Coach",
-        firstMessage: `Hello! I'm excited to interview you for the ${jobTitle} position. I've reviewed your resume, and I'm looking forward to learning more about your experience. Let's begin - could you please tell me a bit about yourself and what interests you about this ${jobTitle} role?`,
+        firstMessage: coachConfig.firstMessage,
         model: {
           provider: "openai",
           model: "gpt-4",
           messages: [
             {
               role: "system",
-              content: `You are an expert AI interview coach conducting a professional job interview for the position: ${jobTitle}.
-
-CANDIDATE'S RESUME:
-${resumeText}
-
-YOUR ROLE AND INSTRUCTIONS:
-1. Conduct a realistic, professional job interview
-2. Ask relevant behavioral and technical questions based on the job requirements and the candidate's resume
-3. Listen attentively to their responses
-4. Provide brief, constructive feedback after key answers
-5. Ask thoughtful follow-up questions to dive deeper
-6. Keep the conversation natural and encouraging
-7. Cover topics like: experience, technical skills, problem-solving, teamwork, and career goals
-8. Aim for a 10-15 minute interview with 5-7 main questions
-
-IMPORTANT BEHAVIORAL NOTES:
-- Be conversational and warm, but professional
-- Don't ask "How can I help you?" - YOU are the interviewer
-- Take turns speaking - ask one question at a time
-- Reference their resume when relevant
-- End the interview by asking if they have questions for you
-
-Begin the interview now. You've already greeted them with the firstMessage.`,
+              content: coachConfig.systemPrompt,
             },
           ],
         },
@@ -333,7 +403,7 @@ Begin the interview now. You've already greeted them with the firstMessage.`,
   return (
     <div className="max-w-2xl mx-auto">
       {/* Status Card */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-8 text-center">
+      <div className="glass-card rounded-2xl p-8 text-center">
         {/* Status Indicator with Sound Waves */}
         <div className="mb-6 relative">
           {/* Animated Sound Waves (only show when AI is speaking) */}
@@ -393,6 +463,16 @@ Begin the interview now. You've already greeted them with the firstMessage.`,
 
         {/* Status Text */}
         <h2 className="text-2xl font-semibold mb-2">{status}</h2>
+        <div
+          className={`mx-auto mb-5 inline-flex items-center rounded-full border px-3 py-1 text-xs ${
+            isConnected
+              ? "border-emerald-400/35 bg-emerald-500/15 text-emerald-100"
+              : "border-sky-400/35 bg-sky-500/15 text-sky-100"
+          }`}
+        >
+          {isConnected ? "Live Call Active" : "Ready To Connect"}
+        </div>
+
         {error && <p className="text-red-400 mb-4">{error}</p>}
         {!error && !isConnected && (
           <p className="text-gray-400 mb-6">
@@ -404,6 +484,24 @@ Begin the interview now. You've already greeted them with the firstMessage.`,
             Speak naturally with the AI interviewer. Your responses will be
             evaluated in real-time.
           </p>
+        )}
+
+        {focusAreas.length > 0 && (
+          <div className="mb-6">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-300">
+              Focus Areas
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {focusAreas.map((area) => (
+                <span
+                  key={area}
+                  className="rounded-full border border-cyan-300/30 bg-cyan-500/10 px-2.5 py-1 text-xs text-cyan-100"
+                >
+                  {area}
+                </span>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Controls */}
@@ -425,7 +523,7 @@ Begin the interview now. You've already greeted them with the firstMessage.`,
                 className={`px-6 py-6 ${
                   isMuted
                     ? "bg-yellow-500/20 border-yellow-500 text-yellow-300 hover:text-yellow-200"
-                    : "border-gray-700 text-black hover:text-white hover:bg-gray-800"
+                    : "border-white/20 bg-white/5 text-white hover:bg-white/10"
                 }`}
               >
                 {isMuted ? (

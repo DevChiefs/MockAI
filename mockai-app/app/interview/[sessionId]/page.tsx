@@ -5,7 +5,13 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  ScrollText,
+} from "lucide-react";
 import Image from "next/image";
 import VapiInterface from "./_components/vapi-interface";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -15,9 +21,8 @@ export default function InterviewPage() {
   const params = useParams();
   const router = useRouter();
   const sessionId = params.sessionId as Id<"interviewSessions">;
-  const [isResumeVisible, setIsResumeVisible] = useState(true);
+  const [isContextVisible, setIsContextVisible] = useState(true);
 
-  // Get auth token from localStorage
   const token =
     typeof window !== "undefined"
       ? localStorage.getItem("mockai_auth_token")
@@ -31,8 +36,10 @@ export default function InterviewPage() {
   if (session === undefined) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
-          <div className="text-xl">Loading session...</div>
+        <div className="app-shell flex min-h-screen items-center justify-center text-white">
+          <div className="glass-card rounded-2xl px-8 py-6 text-xl">
+            Loading session...
+          </div>
         </div>
       </ProtectedRoute>
     );
@@ -41,10 +48,13 @@ export default function InterviewPage() {
   if (session === null) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Session Not Found</h1>
-            <Button onClick={() => router.push("/dashboard")}>
+        <div className="app-shell flex min-h-screen items-center justify-center text-white">
+          <div className="glass-card rounded-2xl px-8 py-7 text-center">
+            <h1 className="mb-4 text-2xl font-semibold">Session Not Found</h1>
+            <Button
+              onClick={() => router.push("/dashboard")}
+              className="bg-gradient-to-r from-sky-500 to-cyan-400 text-slate-950 hover:from-sky-400 hover:to-cyan-300"
+            >
               Return to Dashboard
             </Button>
           </div>
@@ -55,143 +65,161 @@ export default function InterviewPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-black text-white">
-        {/* Header */}
-        <nav className="border-b border-gray-800 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-4">
+      <div className="app-shell min-h-screen text-white">
+        <div className="grid-overlay pointer-events-none absolute inset-0 opacity-25" />
+
+        <div className="relative z-10">
+          <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/55 backdrop-blur-xl">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => router.push("/dashboard")}
-                className="text-gray-400 hover:text-white text-xs sm:text-sm"
+                className="text-xs text-slate-300 hover:text-white sm:text-sm"
               >
-                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <ArrowLeft className="mr-1 h-3.5 w-3.5 sm:mr-2 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Back to Dashboard</span>
                 <span className="sm:hidden">Back</span>
               </Button>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Image
-                src="/mockai-trans-bg.png"
-                alt="MockAI Logo"
-                width={32}
-                height={32}
-                className="sm:w-10 sm:h-10"
-              />
-              <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                MockAI
-              </span>
-            </div>
-          </div>
-        </nav>
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-          {/* Session Header */}
-          <div className="mb-6 sm:mb-8 text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
-              {session.jobTitle}
-            </h1>
-            <p className="text-sm sm:text-base text-gray-400">
-              AI Interview Practice Session
-            </p>
-          </div>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Image
+                  src="/mockai-trans-bg.png"
+                  alt="MockAI Logo"
+                  width={34}
+                  height={34}
+                  className="sm:h-10 sm:w-10"
+                />
+                <span className="text-lg font-semibold sm:text-2xl">MockAI</span>
+              </div>
+            </div>
+          </nav>
 
-          {/* Desktop Layout (md and up): Side by Side */}
-          <div className="hidden md:flex gap-6">
-            {/* Left Side - Interview Interface */}
-            <div className="flex-1">
+          <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8">
+            <div className="glass-card mb-6 rounded-2xl p-5 sm:mb-8 sm:p-7">
+              <h1 className="text-2xl font-semibold sm:text-4xl">
+                {session.jobTitle}
+              </h1>
+              <p className="mt-2 text-sm text-slate-300 sm:text-base">
+                AI Interview Practice Session
+              </p>
+              <div className="mt-4 inline-flex items-center rounded-full border border-cyan-300/35 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-100">
+                Live Voice Interview Context Loaded
+              </div>
+            </div>
+
+            <div className="hidden gap-6 md:flex">
+              <div className="flex-1">
+                <VapiInterface
+                  sessionId={sessionId}
+                  jobTitle={session.jobTitle}
+                  jobDescription={session.jobDescription}
+                  resumeText={session.resumeText}
+                />
+              </div>
+
+              <div
+                className={`transition-all duration-300 ${
+                  isContextVisible ? "w-96" : "w-14"
+                }`}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsContextVisible(!isContextVisible)}
+                  className="mb-3 text-slate-300 hover:text-white"
+                >
+                  {isContextVisible ? (
+                    <>
+                      <ChevronRight className="mr-2 h-4 w-4" />
+                      Hide Context
+                    </>
+                  ) : (
+                    <>
+                      <ChevronLeft className="mr-2 h-4 w-4" />
+                      Show Context
+                    </>
+                  )}
+                </Button>
+
+                {isContextVisible && (
+                  <aside className="glass-card h-[calc(100vh-250px)] space-y-5 overflow-y-auto rounded-2xl p-5">
+                    {session.jobDescription && (
+                      <section>
+                        <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
+                          <ScrollText className="h-5 w-5 text-cyan-300" />
+                          <h3 className="text-base font-semibold">
+                            Job Description
+                          </h3>
+                        </div>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
+                          {session.jobDescription}
+                        </p>
+                      </section>
+                    )}
+
+                    <section>
+                      <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
+                        <FileText className="h-5 w-5 text-cyan-300" />
+                        <h3 className="text-base font-semibold">Your Resume</h3>
+                      </div>
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
+                        {session.resumeText}
+                      </p>
+                    </section>
+                  </aside>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-6 md:hidden">
               <VapiInterface
                 sessionId={sessionId}
                 jobTitle={session.jobTitle}
+                jobDescription={session.jobDescription}
                 resumeText={session.resumeText}
               />
-            </div>
 
-            {/* Right Side - Resume Panel (Desktop) */}
-            <div
-              className={`transition-all duration-300 ${
-                isResumeVisible ? "w-96" : "w-12"
-              }`}
-            >
-              {/* Toggle Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsResumeVisible(!isResumeVisible)}
-                className="mb-4 text-gray-400 hover:text-white"
-              >
-                {isResumeVisible ? (
-                  <>
-                    <ChevronRight className="w-4 h-4 mr-2" />
-                    Hide Resume
-                  </>
-                ) : (
-                  <>
-                    <ChevronLeft className="w-4 h-4 mr-2" />
-                    Show Resume
-                  </>
+              <div className="glass-card overflow-hidden rounded-2xl">
+                <button
+                  onClick={() => setIsContextVisible(!isContextVisible)}
+                  className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-cyan-300" />
+                    <h3 className="font-semibold">Interview Context</h3>
+                  </div>
+                  {isContextVisible ? (
+                    <ChevronRight className="h-5 w-5 text-slate-400" />
+                  ) : (
+                    <ChevronLeft className="h-5 w-5 text-slate-400" />
+                  )}
+                </button>
+
+                {isContextVisible && (
+                  <div className="max-h-[460px] space-y-5 overflow-y-auto border-t border-white/10 px-4 pb-4 pt-4">
+                    {session.jobDescription && (
+                      <section>
+                        <h4 className="mb-2 text-sm font-semibold text-cyan-100">
+                          Job Description
+                        </h4>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
+                          {session.jobDescription}
+                        </p>
+                      </section>
+                    )}
+
+                    <section>
+                      <h4 className="mb-2 text-sm font-semibold text-cyan-100">
+                        Your Resume
+                      </h4>
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
+                        {session.resumeText}
+                      </p>
+                    </section>
+                  </div>
                 )}
-              </Button>
-
-              {/* Resume Content */}
-              {isResumeVisible && (
-                <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6 h-[calc(100vh-220px)] overflow-y-auto">
-                  {/* Header */}
-                  <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-800">
-                    <FileText className="w-5 h-5 text-blue-400" />
-                    <h3 className="text-lg font-semibold">Your Resume</h3>
-                  </div>
-
-                  {/* Resume Text */}
-                  <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
-                    {session.resumeText}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile/Tablet Layout (below md): Stacked */}
-          <div className="md:hidden space-y-6">
-            {/* Interview Interface */}
-            <div>
-              <VapiInterface
-                sessionId={sessionId}
-                jobTitle={session.jobTitle}
-                resumeText={session.resumeText}
-              />
-            </div>
-
-            {/* Resume Section (Mobile/Tablet) */}
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden">
-              {/* Toggle Button */}
-              <button
-                onClick={() => setIsResumeVisible(!isResumeVisible)}
-                className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-800/50 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-400" />
-                  <h3 className="font-semibold">Your Resume</h3>
-                </div>
-                {isResumeVisible ? (
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                ) : (
-                  <ChevronLeft className="w-5 h-5 text-gray-400" />
-                )}
-              </button>
-
-              {/* Resume Content (Collapsible) */}
-              {isResumeVisible && (
-                <div className="px-4 pb-4 max-h-[400px] overflow-y-auto">
-                  <div className="pt-4 border-t border-gray-800">
-                    <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
-                      {session.resumeText}
-                    </div>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </div>
         </div>

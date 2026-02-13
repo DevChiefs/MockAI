@@ -21,6 +21,7 @@ export default defineSchema({
   interviewSessions: defineTable({
     userId: v.id("users"),
     jobTitle: v.string(),
+    jobDescription: v.optional(v.string()),
     resumeText: v.string(),
     vapiSessionId: v.optional(v.string()),
     status: v.union(

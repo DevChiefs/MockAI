@@ -1,11 +1,12 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 
 // Helper function to verify auth token and get user
-async function authenticateUser(ctx: any, token: string) {
+async function authenticateUser(ctx: QueryCtx | MutationCtx, token: string) {
   const session = await ctx.db
     .query("authSessions")
-    .withIndex("by_token", (q: any) => q.eq("token", token))
+    .withIndex("by_token", (q) => q.eq("token", token))
     .first();
 
   if (!session) {
@@ -14,7 +15,6 @@ async function authenticateUser(ctx: any, token: string) {
 
   // Check if session is expired
   if (session.expiresAt < Date.now()) {
-    await ctx.db.delete(session._id);
     return null;
   }
 
@@ -26,6 +26,7 @@ export const createSession = mutation({
   args: {
     token: v.string(),
     jobTitle: v.string(),
+    jobDescription: v.string(),
     resumeText: v.string(),
   },
   handler: async (ctx, args) => {
@@ -42,6 +43,7 @@ export const createSession = mutation({
     const sessionId = await ctx.db.insert("interviewSessions", {
       userId: user._id,
       jobTitle: args.jobTitle,
+      jobDescription: args.jobDescription,
       resumeText: args.resumeText,
       status: "pending",
       createdAt: Date.now(),

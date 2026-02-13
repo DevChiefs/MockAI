@@ -5,18 +5,66 @@ import Image from "next/image";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  BrainCircuit,
+  ChartSpline,
+  MessageCircleHeart,
+  MicVocal,
+  Sparkles,
+} from "lucide-react";
+
+const featureCards = [
+  {
+    title: "Role-Specific Questions",
+    description:
+      "Interview prompts are tailored to your resume, target role, and job description.",
+    icon: BrainCircuit,
+  },
+  {
+    title: "Live Voice Practice",
+    description:
+      "Simulate a real interview with an AI interviewer that speaks naturally and asks follow-ups.",
+    icon: MicVocal,
+  },
+  {
+    title: "Focused Improvement",
+    description:
+      "Practice repeatedly with structured prompts designed to reveal communication and technical gaps.",
+    icon: ChartSpline,
+  },
+];
+
+const workflowSteps = [
+  {
+    title: "Create Session",
+    description: "Set role title, paste the job description, and upload your resume PDF.",
+  },
+  {
+    title: "Start Interview",
+    description:
+      "Launch a voice session and answer realistic behavioral and technical prompts.",
+  },
+  {
+    title: "Repeat & Improve",
+    description:
+      "Run new sessions for different roles to sharpen confidence and response quality.",
+  },
+];
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden font-sans">
-      <div className="hidden md:block absolute inset-0 opacity-20">
+    <div className="app-shell min-h-screen overflow-hidden text-white">
+      <div className="grid-overlay pointer-events-none absolute inset-0 opacity-25" />
+
+      <div className="pointer-events-none absolute inset-0 hidden opacity-20 md:block">
         <FaultyTerminal
           scale={1.2}
           gridMul={[3, 2]}
-          digitSize={1.0}
+          digitSize={1}
           timeScale={0.5}
           pause={false}
           scanlineIntensity={0.3}
@@ -35,201 +83,200 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        <nav className="flex items-center justify-between p-6 md:p-8">
-          <div className="flex items-center">
-            <Image
-              src="/mockai-trans-bg.png"
-              alt="MockAI Logo"
-              width={50}
-              height={50}
-            />
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-              MockAI
-            </span>
-          </div>
-          <div className="flex items-center space-x-8">
-            <div className="hidden md:flex space-x-8">
-              <a
-                href="#features"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
+        <nav className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/55 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
+            <div className="flex items-center gap-2">
+              <Image
+                src="/mockai-trans-bg.png"
+                alt="MockAI Logo"
+                width={44}
+                height={44}
+              />
+              <span className="text-xl font-semibold tracking-tight">
+                MockAI
+              </span>
+            </div>
+
+            <div className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
+              <a href="#features" className="transition-colors hover:text-white">
                 Features
               </a>
-              <a
-                href="#about"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
+              <a href="#how-it-works" className="transition-colors hover:text-white">
+                How It Works
+              </a>
+              <a href="#about" className="transition-colors hover:text-white">
                 About
               </a>
-              <a
-                href="/register"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Get Started
-              </a>
             </div>
+
+            <Button
+              onClick={() =>
+                router.push(isAuthenticated ? "/dashboard" : "/register")
+              }
+              className="bg-gradient-to-r from-sky-500 to-cyan-400 text-slate-950 hover:from-sky-400 hover:to-cyan-300"
+            >
+              {isAuthenticated ? "Open Dashboard" : "Get Started"}
+            </Button>
           </div>
         </nav>
 
-        <section className="px-6 md:px-8 py-20 md:py-32 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Master Your
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent block">
-                Job Interviews
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Your AI-powered interview companion that helps you prepare,
-              practice, and excel in any job interview with personalized
-              guidance and real-time feedback.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button
-                onClick={() =>
-                  isAuthenticated
-                    ? router.push("/dashboard")
-                    : router.push("/register")
-                }
-                className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
-                {isAuthenticated ? "Start Practicing" : "Get Started Free"}
-              </button>
-              <button className="border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300">
-                Watch Demo
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section id="features" className="px-6 md:px-8 py-20">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
-              Why Choose
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                {" "}
-                MockAI
-              </span>
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-8 hover:border-blue-500/50 transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center mb-6">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-4">
-                  AI-Powered Practice
-                </h3>
-                <p className="text-gray-400 leading-relaxed">
-                  Get personalized interview questions tailored to your
-                  industry, role, and experience level with intelligent AI
-                  analysis.
-                </p>
-              </div>
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-8 hover:border-blue-500/50 transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center mb-6">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4v10a2 2 0 002 2h6a2 2 0 002-2V8M7 8h10M7 8l-2-2m12 2l2-2"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-4">
-                  Real-time Feedback
-                </h3>
-                <p className="text-gray-400 leading-relaxed">
-                  Receive instant feedback on your answers, body language, and
-                  speaking pace to improve your interview performance.
-                </p>
-              </div>
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-8 hover:border-blue-500/50 transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center mb-6">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-4">
-                  Progress Tracking
-                </h3>
-                <p className="text-gray-400 leading-relaxed">
-                  Monitor your improvement over time with detailed analytics and
-                  personalized recommendations for skill development.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="px-6 md:px-8 py-20">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Ace Your Next Interview?
-            </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of professionals who have successfully landed their
-              dream jobs with MockAI&apos;s comprehensive interview preparation
-              platform.
-            </p>
-            <Button
-              onClick={() =>
-                isAuthenticated
-                  ? router.push("/practice")
-                  : router.push("/register")
-              }
-              className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-10 py-5 rounded-lg text-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-            >
-              {isAuthenticated ? "Go to Dashboard" : "Get Started for Free"}
-            </Button>
-          </div>
-        </section>
-
-        <footer className="px-6 md:px-8 py-12 border-t border-gray-800">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="flex items-center mb-4 md:mb-0">
-                <Image
-                  src="/mockai-trans-bg.png"
-                  alt="MockAI Logo"
-                  width={50}
-                  height={50}
-                />
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                  MockAI
+        <main>
+          <section className="px-5 pb-16 pt-20 md:px-8 md:pt-24">
+            <div className="mx-auto max-w-6xl">
+              <div className="mx-auto max-w-4xl text-center">
+                <span className="section-label">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  AI Interview Studio
                 </span>
+
+                <h1 className="mt-5 text-4xl font-semibold leading-tight sm:text-5xl md:text-7xl">
+                  Practice Interviews
+                  <span className="block bg-gradient-to-r from-sky-300 to-cyan-200 bg-clip-text text-transparent">
+                    Like It&apos;s The Real One
+                  </span>
+                </h1>
+
+                <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-slate-300 sm:text-lg md:text-xl">
+                  MockAI runs role-aware voice interviews using your resume and
+                  the job description, so each session targets the exact
+                  position you care about.
+                </p>
+
+                <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                  <Button
+                    onClick={() =>
+                      router.push(isAuthenticated ? "/dashboard" : "/register")
+                    }
+                    className="h-12 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 px-8 text-base font-semibold text-slate-950 hover:from-sky-400 hover:to-cyan-300"
+                  >
+                    {isAuthenticated ? "Start New Session" : "Start Free Practice"}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push("/login")}
+                    className="h-12 rounded-xl border-white/20 bg-white/5 px-8 text-base text-slate-100 hover:bg-white/10"
+                  >
+                    Sign In
+                  </Button>
+                </div>
               </div>
-              <div className="text-gray-400 text-sm">
-                © 2025 MockAI. All rights reserved.
+
+              <div className="mt-12 grid gap-4 sm:grid-cols-3">
+                <div className="glass-card floating-soft rounded-2xl p-5">
+                  <p className="text-sm text-slate-300">Interview Mode</p>
+                  <p className="mt-1 text-2xl font-semibold">Voice + AI</p>
+                </div>
+                <div
+                  className="glass-card floating-soft rounded-2xl p-5"
+                  style={{ animationDelay: "0.8s" }}
+                >
+                  <p className="text-sm text-slate-300">Session Inputs</p>
+                  <p className="mt-1 text-2xl font-semibold">Resume + Job JD</p>
+                </div>
+                <div
+                  className="glass-card floating-soft rounded-2xl p-5"
+                  style={{ animationDelay: "1.6s" }}
+                >
+                  <p className="text-sm text-slate-300">Interview Length</p>
+                  <p className="mt-1 text-2xl font-semibold">10-15 Min Target</p>
+                </div>
               </div>
             </div>
+          </section>
+
+          <section id="features" className="px-5 py-16 md:px-8 md:py-20">
+            <div className="mx-auto max-w-6xl">
+              <div className="mb-10 text-center">
+                <span className="section-label">Built For Real Prep</span>
+                <h2 className="mt-4 text-3xl font-semibold md:text-5xl">
+                  Why MockAI Works
+                </h2>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-3">
+                {featureCards.map((feature) => (
+                  <article
+                    key={feature.title}
+                    className="glass-card glass-card-hover rounded-2xl p-6"
+                  >
+                    <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 text-slate-950">
+                      <feature.icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-xl font-semibold">{feature.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                      {feature.description}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section id="how-it-works" className="px-5 py-16 md:px-8 md:py-20">
+            <div className="mx-auto max-w-6xl">
+              <div className="mb-10 text-center">
+                <span className="section-label">
+                  <MessageCircleHeart className="h-3.5 w-3.5" />
+                  Workflow
+                </span>
+                <h2 className="mt-4 text-3xl font-semibold md:text-5xl">
+                  From Setup To Practice In Minutes
+                </h2>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                {workflowSteps.map((step, index) => (
+                  <div key={step.title} className="glass-card rounded-2xl p-6">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-cyan-200/90">
+                      Step {index + 1}
+                    </p>
+                    <h3 className="mt-2 text-xl font-semibold">{step.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                      {step.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section id="about" className="px-5 pb-20 pt-10 md:px-8">
+            <div className="mx-auto max-w-5xl">
+              <div className="glass-card rounded-3xl border border-cyan-300/30 p-7 text-center md:p-10">
+                <h2 className="text-3xl font-semibold md:text-5xl">
+                  Ready To Practice Your Next Interview?
+                </h2>
+                <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300">
+                  Create a session, upload your resume, and rehearse with a
+                  realistic AI interviewer that stays aligned with your target
+                  role.
+                </p>
+                <Button
+                  onClick={() =>
+                    router.push(isAuthenticated ? "/dashboard" : "/register")
+                  }
+                  className="mt-8 h-12 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 px-8 text-base font-semibold text-slate-950 hover:from-sky-400 hover:to-cyan-300"
+                >
+                  {isAuthenticated ? "Go To Dashboard" : "Create Free Account"}
+                </Button>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer className="border-t border-white/10 px-5 py-8 md:px-8">
+          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-sm text-slate-400 md:flex-row">
+            <div className="flex items-center gap-2">
+              <Image
+                src="/mockai-trans-bg.png"
+                alt="MockAI Logo"
+                width={26}
+                height={26}
+              />
+              <span>MockAI</span>
+            </div>
+            <span>© 2026 MockAI. Interview smarter.</span>
           </div>
         </footer>
       </div>
